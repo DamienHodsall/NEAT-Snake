@@ -1,0 +1,103 @@
+#include <gtest/gtest.h>
+
+#include "Genetic.hpp"
+
+TEST(GeneticTests, print)
+{
+    Genetic::Network test = Genetic::Network();
+    Genetic::Node* inNode = test.nodes.head->data->head->data;
+    Genetic::Node* outNode = test.nodes.tail->data->head->data;
+    test.addConnection(inNode, outNode, 0.5);
+    test.addConnection(inNode, outNode, 0.75);
+    test.addNode(test.connections.head->data->head->data);
+    test.addNode(test.connections.head->data->head->next->data);
+
+    std::cout << test;
+}
+
+TEST(GeneticTests, simple)
+{
+    Genetic::Network test = Genetic::Network();
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.tail->data->head->data, 0.5);
+
+    float* input = new float(0.75);
+    LL::LinkedList<float> inputs(input);
+    LL::LinkedList<float> outputs = test.compute(inputs);
+
+    EXPECT_FLOAT_EQ(0.5 * 0.75, *(outputs.head->data));
+}
+
+TEST(GeneticTests, nodeLists)
+{
+    Genetic::Network test = Genetic::Network();
+
+    Genetic::Node* inNode = test.nodes.head->data->head->data;
+    Genetic::Node* outNode = test.nodes.tail->data->head->data;
+    test.addConnection(inNode, outNode, 0.5);
+
+    EXPECT_EQ(inNode->out.head->data, outNode->in.head->data);
+}
+
+TEST(GeneticTests, networkI1C2O1)
+{
+    Genetic::Network test = Genetic::Network();
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.tail->data->head->data, 0.5);
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.tail->data->head->data, 0.75);
+
+    float* input = new float(0.75);
+    LL::LinkedList<float> inputs(input);
+    LL::LinkedList<float> outputs = test.compute(inputs);
+
+    EXPECT_FLOAT_EQ((0.5 + 0.75) * 0.75, *(outputs.head->data));
+}
+
+TEST(GeneticTests, networkI2C1O1)
+{
+    Genetic::Network test = Genetic::Network(2, 1);
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.tail->data->head->data, 0.5);
+    test.addConnection(test.nodes.head->data->head->next->data,
+                       test.nodes.tail->data->head->data, 0.90);
+
+    float* input = new float(0.75);
+    LL::LinkedList<float> inputs(input);
+    float* tmp = new float(0.25);
+    inputs.push_back(tmp);
+    LL::LinkedList<float> outputs = test.compute(inputs);
+
+    EXPECT_FLOAT_EQ(0.75 * 0.5 + 0.25 * 0.90, *(outputs.head->data));
+}
+
+TEST(GeneticTests, networkI1C1H1C1O1)
+{
+    Genetic::Network test = Genetic::Network();
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.tail->data->head->data, 0.25);
+    test.addNode(test.connections.head->data->head->data);
+
+    float* input = new float(0.90);
+    LL::LinkedList<float> inputs(input);
+    LL::LinkedList<float> outputs = test.compute(inputs);
+
+    EXPECT_FLOAT_EQ(0.90 * 0.25, *(outputs.head->data));
+}
+
+TEST(GeneticTests, networkI1C1H2C1O1)
+{
+    Genetic::Network test = Genetic::Network();
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.tail->data->head->data, 0.25);
+    test.addNode(test.connections.head->data->head->data);
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.head->next->data->head->data, 0.35);
+    test.addNode(test.connections.head->data->head->next->data);
+
+    float* input = new float(0.90);
+    LL::LinkedList<float> inputs(input);
+    LL::LinkedList<float> outputs = test.compute(inputs);
+
+    EXPECT_FLOAT_EQ(0.90 * 0.35 + 0.90 * 0.25, *(outputs.head->data));
+}
