@@ -298,6 +298,17 @@ void Network::mutate()
     {
         // add a connection
         // choose a starting node then choose a random node that is after it
+        int start = rand() % (nodes.length - 1);
+        LL::Node<LL::LinkedList<Node>>* startlayer = nodes.get(start);
+        LL::Node<Node>* startnode =
+            startlayer->data->get(rand() % startlayer->data->length);
+
+        int end = start + 1 + rand() % (nodes.length - start - 1);
+        LL::Node<LL::LinkedList<Node>>* endlayer = nodes.get(end);
+        LL::Node<Node>* endnode =
+            endlayer->data->get(rand() % endlayer->data->length);
+
+        addConnection(startnode->data, endnode->data, (float)rand() / RAND_MAX);
     }
 
     int rand3 = rand();
