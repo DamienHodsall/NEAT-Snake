@@ -291,6 +291,25 @@ void Network::mutate()
     if (rand1 < 0.8 * RAND_MAX)
     {
         // mutate a weight
+        if (rand() % 2)
+        {
+            // mutate a node weight
+            int layer = 1 + rand() % (nodes.length - 1);
+            LL::Node<LL::LinkedList<Node>>* nodelayer = nodes.get(layer);
+            LL::Node<Node>* node =
+                nodelayer->data->get(rand() % nodelayer->data->length);
+            node->data->bias = (float)rand() / RAND_MAX;
+        }
+        else
+        {
+            // mutate a connection weight
+            int layer = 1 + rand() % (connections.length - 1);
+            LL::Node<LL::LinkedList<Connection>>* nodelayer =
+                connections.get(layer);
+            LL::Node<Connection>* node =
+                nodelayer->data->get(rand() % nodelayer->data->length);
+            node->data->weight = (float)rand() / RAND_MAX;
+        }
     }
 
     int rand2 = rand();
