@@ -126,3 +126,29 @@ TEST(GeneticTests, mutation)
     // LL::LinkedList<float> output = test.compute(input);
     // std::cout << output << std::endl;
 }
+
+TEST(GeneticTests, population)
+{
+    // go with 1000 for a realistic size
+    const int pop_size = 100;
+    Genetic::Network* population[pop_size];
+
+    for (int i = 0; i < pop_size; i++)
+    {
+        population[i] = new Genetic::Network(1, 1);
+        for (int j = 0; j < 500; j++)
+        {
+            population[i]->mutate();
+        }
+    }
+
+    float* data = new float(0.5);
+    LL::LinkedList<float> input(data);
+    // a typical game lasts 5000 steps
+    for (int j = 0; j < 50; j++)
+        for (int i = 0; i < pop_size; i++)
+            population[i]->compute(input);
+
+    // std::cout << *population[0] << std::endl;
+    // std::cout << *population[1] << std::endl;
+}
