@@ -293,19 +293,27 @@ void Network::mutate()
             // mutate a node weight
             int layer = 1 + rand() % (nodes.length - 1);
             LL::Node<LL::LinkedList<Node>>* nodelayer = nodes.get(layer);
-            LL::Node<Node>* node =
-                nodelayer->data->get(rand() % nodelayer->data->length);
-            node->data->bias = (float)rand() / RAND_MAX;
+            if (nodelayer->data->length > 0)
+            {
+                LL::Node<Node>* node =
+                    nodelayer->data->get(rand() % nodelayer->data->length);
+                float dbias = 1.0 - 2.0 * ((0.1 * rand()) / RAND_MAX);
+                node->data->bias += dbias;
+            }
         }
         else
         {
             // mutate a connection weight
-            int layer = 1 + rand() % (connections.length - 1);
-            LL::Node<LL::LinkedList<Connection>>* nodelayer =
+            int layer = rand() % (connections.length);
+            LL::Node<LL::LinkedList<Connection>>* conlayer =
                 connections.get(layer);
-            LL::Node<Connection>* node =
-                nodelayer->data->get(rand() % nodelayer->data->length);
-            node->data->weight = (float)rand() / RAND_MAX;
+            if (conlayer->data->length > 0)
+            {
+                LL::Node<Connection>* node =
+                    conlayer->data->get(rand() % conlayer->data->length);
+                float dweight = 1.0 - 2.0 * ((0.1 * rand()) / RAND_MAX);
+                node->data->weight += dweight;
+            }
         }
     }
 
@@ -323,7 +331,8 @@ void Network::mutate()
         LL::Node<Node>* endnode =
             endlayer->data->get(rand() % endlayer->data->length);
 
-        addConnection(startnode->data, endnode->data, (float)rand() / RAND_MAX);
+        addConnection(startnode->data, endnode->data,
+                      1.0 - 2.0 * (float)rand() / RAND_MAX);
     }
 
     if (rand() < 0.03 * RAND_MAX)
@@ -331,9 +340,12 @@ void Network::mutate()
         // add a node
         LL::Node<LL::LinkedList<Connection>>* conlayer =
             connections.get(rand() % connections.length);
-        LL::Node<Connection>* con =
-            conlayer->data->get(rand() % conlayer->data->length);
-        addNode(con->data);
+        if (conlayer->data->length > 0)
+        {
+            LL::Node<Connection>* con =
+                conlayer->data->get(rand() % conlayer->data->length);
+            addNode(con->data);
+        }
     }
 }
 

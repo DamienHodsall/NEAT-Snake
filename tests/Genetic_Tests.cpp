@@ -101,3 +101,28 @@ TEST(GeneticTests, networkI1C1H2C1O1)
 
     EXPECT_FLOAT_EQ(0.90 * 0.35 + 0.90 * 0.25, *(outputs.head->data));
 }
+
+TEST(GeneticTests, mutation)
+{
+    Genetic::Network test = Genetic::Network();
+    test.addConnection(test.nodes.head->data->head->data,
+                       test.nodes.tail->data->head->data, 0.25);
+    std::cout << test.nodes.length << std::endl;
+
+    for (int i = 0; i < 1000; i++)
+        test.mutate();
+
+    float* data = new float(0.5);
+    LL::LinkedList<float> input(data);
+    std::cout << test << std::endl;
+
+    LL::Node<LL::LinkedList<Genetic::Node>>* cur = test.nodes.head;
+    std::cout << cur->data->length;
+    while (cur = cur->next)
+    {
+        std::cout << ", " << cur->data->length;
+    }
+    std::cout << std::endl;
+    // LL::LinkedList<float> output = test.compute(input);
+    // std::cout << output << std::endl;
+}
