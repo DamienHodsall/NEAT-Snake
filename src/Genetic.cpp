@@ -100,7 +100,7 @@ std::ostream& operator<<(std::ostream& os, Connection& con)
     return os;
 }
 
-Network::Network() : nodes(nullptr), connections(nullptr), innovation(-2)
+Network::Network() : nodes(), connections(), innovation(-2)
 {
     Node* input = new Node(innovation++, 0.0);
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>(input);
@@ -110,15 +110,14 @@ Network::Network() : nodes(nullptr), connections(nullptr), innovation(-2)
     LL::LinkedList<Node>* outlist = new LL::LinkedList<Node>(output);
     nodes.push_back(outlist);
 
-    LL::LinkedList<Connection>* conlist =
-        new LL::LinkedList<Connection>(nullptr);
+    LL::LinkedList<Connection>* conlist = new LL::LinkedList<Connection>();
     connections.push_back(conlist);
 }
 
 Network::Network(int n_inputs, int n_outputs)
-    : nodes(nullptr), connections(nullptr), innovation(-n_inputs - n_outputs)
+    : nodes(), connections(), innovation(-n_inputs - n_outputs)
 {
-    LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>(nullptr);
+    LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
     for (int i = 0; i < n_inputs; i++)
     {
         Node* input = new Node(innovation++, 0.0);
@@ -126,7 +125,7 @@ Network::Network(int n_inputs, int n_outputs)
     }
     nodes.push_back(inlist);
 
-    LL::LinkedList<Node>* outlist = new LL::LinkedList<Node>(nullptr);
+    LL::LinkedList<Node>* outlist = new LL::LinkedList<Node>();
     for (int i = 0; i < n_outputs; i++)
     {
         Node* output = new Node(innovation++, 0.0);
@@ -134,8 +133,7 @@ Network::Network(int n_inputs, int n_outputs)
     }
     nodes.push_back(outlist);
 
-    LL::LinkedList<Connection>* conlist =
-        new LL::LinkedList<Connection>(nullptr);
+    LL::LinkedList<Connection>* conlist = new LL::LinkedList<Connection>();
     connections.push_back(conlist);
 }
 
@@ -287,8 +285,7 @@ void Network::addConnection(Node* input, Node* output, float weight)
 void Network::mutate()
 {
     // TODO some random stuff ig
-    int rand1 = rand();
-    if (rand1 < 0.8 * RAND_MAX)
+    if (rand() < 0.8 * RAND_MAX)
     {
         // mutate a weight
         if (rand() % 2)
@@ -312,8 +309,7 @@ void Network::mutate()
         }
     }
 
-    int rand2 = rand();
-    if (rand2 < 0.05 * RAND_MAX)
+    if (rand() < 0.05 * RAND_MAX)
     {
         // add a connection
         // choose a starting node then choose a random node that is after it
@@ -330,8 +326,7 @@ void Network::mutate()
         addConnection(startnode->data, endnode->data, (float)rand() / RAND_MAX);
     }
 
-    int rand3 = rand();
-    if (rand3 < 0.01 * RAND_MAX)
+    if (rand() < 0.03 * RAND_MAX)
     {
         // add a node
         LL::Node<LL::LinkedList<Connection>>* conlayer =
