@@ -141,6 +141,17 @@ Network::Network(int* history, int n_inputs, int n_outputs)
     connections.push_back(conlist);
 }
 
+Network::Network(const Network& rhs)
+{
+    // idek man, this is tough...
+
+    int* hist = new int(0);
+    Network(hist, rhs.nodes.head->data->length, rhs.nodes.tail->data->length);
+
+    // then addConnection and addNode until finished
+}
+
+
 void Network::addNode(Connection* con)
 {
     Node* node = new Node((*innovation)++, 0);

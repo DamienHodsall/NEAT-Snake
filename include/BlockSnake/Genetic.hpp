@@ -54,6 +54,7 @@ class Network
 
     Network(int*);
     Network(int*, int, int);
+    Network(const Network&);
 
     void addNode(Connection*);
     void addConnection(Node*, Node*, float);
