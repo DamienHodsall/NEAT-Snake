@@ -10,10 +10,10 @@ class Coordinate
 
     Coordinate(int, int);
 
-    Coordinate Left();
-    Coordinate Right();
-    Coordinate Up();
-    Coordinate Down();
+    Coordinate* Left();
+    Coordinate* Right();
+    Coordinate* Up();
+    Coordinate* Down();
 
     friend std::ostream& operator<<(std::ostream&, Coordinate&);
     friend bool operator==(Coordinate&, Coordinate&);

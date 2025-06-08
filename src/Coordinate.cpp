@@ -2,33 +2,33 @@
 
 Coordinate::Coordinate(int xi, int yi) : x(xi), y(yi) {};
 
-Coordinate Coordinate::Left()
+Coordinate* Coordinate::Left()
 {
-    return Coordinate(x - 1, y);
+    return new Coordinate(x - 1, y);
 }
 
-Coordinate Coordinate::Right()
+Coordinate* Coordinate::Right()
 {
-    return Coordinate(x + 1, y);
+    return new Coordinate(x + 1, y);
 }
 
-Coordinate Coordinate::Up()
+Coordinate* Coordinate::Up()
 {
-    return Coordinate(x, y - 1);
+    return new Coordinate(x, y - 1);
 }
 
-Coordinate Coordinate::Down()
+Coordinate* Coordinate::Down()
 {
-    return Coordinate(x, y + 1);
+    return new Coordinate(x, y + 1);
 }
 
-std::ostream& operator<<(std::ostream& os, Coordinate &coord)
+std::ostream& operator<<(std::ostream& os, Coordinate& coord)
 {
     os << "(" << coord.x << "," << coord.y << ")";
     return os;
 }
 
-bool operator==(Coordinate &left, Coordinate &right)
+bool operator==(Coordinate& left, Coordinate& right)
 {
-    return (left.x == right. x) && (left.y == right.y);
+    return (left.x == right.x) && (left.y == right.y);
 }
