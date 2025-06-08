@@ -227,7 +227,7 @@ TEST(LinkedListTests, rangeBasedLoop)
         test.push_back(tmp);
     }
 
-    std::cout << test << std::endl;
+    int i = 0;
     for (float& val : test)
-        std::cout << val << std::endl;
+        EXPECT_FLOAT_EQ(tmps[i++], val);
 }
