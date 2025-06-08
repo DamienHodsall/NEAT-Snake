@@ -214,3 +214,20 @@ TEST(LinkedListTests, get)
 
     EXPECT_EQ(test.head->next, test.get(1));
 }
+
+TEST(LinkedListTests, rangeBasedLoop)
+{
+    LL::LinkedList<float> test;
+
+    float tmps[3] = {0.5, 0.6, 0.7};
+
+    for (int i = 0; i < 3; i++)
+    {
+        float* tmp = new float(tmps[i]);
+        test.push_back(tmp);
+    }
+
+    std::cout << test << std::endl;
+    for (float& val : test)
+        std::cout << val << std::endl;
+}

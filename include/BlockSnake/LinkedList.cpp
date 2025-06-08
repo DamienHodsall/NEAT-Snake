@@ -4,6 +4,7 @@
 // sorry about the cursed cpp in the includes...
 // I was having some linker/cmake issues and this worked
 
+#include <iterator>
 #include <ostream>
 
 namespace LL
@@ -57,6 +58,29 @@ class LinkedList
 
         return os;
     }
+
+    // gross iterator stuff
+    class Iterator
+    {
+       public:
+        Iterator(Node<T>* node) : cur(node) {};
+
+        T& operator*() { return *cur->data; };
+
+        Iterator& operator++()
+        {
+            cur = cur->next;
+            return *this;
+        }
+
+        bool operator!=(const Iterator& rhs) const { return cur != rhs.cur; }
+
+       private:
+        Node<T>* cur;
+    };
+
+    Iterator begin() { return Iterator(head); }
+    Iterator end() { return Iterator(nullptr); }
 };
 
 // implementation here cause linking bull
