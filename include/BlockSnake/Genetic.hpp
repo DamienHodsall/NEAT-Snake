@@ -50,10 +50,10 @@ class Network
    public:
     LL::LinkedList<LL::LinkedList<Node>> nodes;
     LL::LinkedList<LL::LinkedList<Connection>> connections;
-    int innovation;
+    int* innovation;
 
-    Network();
-    Network(int, int);
+    Network(int*);
+    Network(int*, int, int);
 
     void addNode(Connection*);
     void addConnection(Node*, Node*, float);

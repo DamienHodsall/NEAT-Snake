@@ -4,7 +4,8 @@
 
 TEST(GeneticTests, print)
 {
-    Genetic::Network test = Genetic::Network();
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
     Genetic::Node* inNode = test.nodes.head->data->head->data;
     Genetic::Node* outNode = test.nodes.tail->data->head->data;
     test.addConnection(inNode, outNode, 0.5);
@@ -17,7 +18,8 @@ TEST(GeneticTests, print)
 
 TEST(GeneticTests, simple)
 {
-    Genetic::Network test = Genetic::Network();
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.5);
 
@@ -30,7 +32,8 @@ TEST(GeneticTests, simple)
 
 TEST(GeneticTests, nodeLists)
 {
-    Genetic::Network test = Genetic::Network();
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
 
     Genetic::Node* inNode = test.nodes.head->data->head->data;
     Genetic::Node* outNode = test.nodes.tail->data->head->data;
@@ -41,7 +44,8 @@ TEST(GeneticTests, nodeLists)
 
 TEST(GeneticTests, networkI1C2O1)
 {
-    Genetic::Network test = Genetic::Network();
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.5);
     test.addConnection(test.nodes.head->data->head->data,
@@ -56,7 +60,8 @@ TEST(GeneticTests, networkI1C2O1)
 
 TEST(GeneticTests, networkI2C1O1)
 {
-    Genetic::Network test = Genetic::Network(2, 1);
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history, 2, 1);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.5);
     test.addConnection(test.nodes.head->data->head->next->data,
@@ -73,7 +78,8 @@ TEST(GeneticTests, networkI2C1O1)
 
 TEST(GeneticTests, networkI1C1H1C1O1)
 {
-    Genetic::Network test = Genetic::Network();
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.25);
     test.addNode(test.connections.head->data->head->data);
@@ -87,7 +93,8 @@ TEST(GeneticTests, networkI1C1H1C1O1)
 
 TEST(GeneticTests, networkI1C1H2C1O1)
 {
-    Genetic::Network test = Genetic::Network();
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.25);
     test.addNode(test.connections.head->data->head->data);
@@ -104,7 +111,8 @@ TEST(GeneticTests, networkI1C1H2C1O1)
 
 TEST(GeneticTests, mutation)
 {
-    Genetic::Network test = Genetic::Network();
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.25);
     std::cout << test.nodes.length << std::endl;
@@ -130,24 +138,33 @@ TEST(GeneticTests, mutation)
 TEST(GeneticTests, population)
 {
     // go with 1000 for a realistic size
-    const int pop_size = 100;
+    const int pop_size = 10;
+    int history = 0;
     Genetic::Network* population[pop_size];
 
     for (int i = 0; i < pop_size; i++)
     {
-        population[i] = new Genetic::Network(1, 1);
-        for (int j = 0; j < 500; j++)
+        population[i] = new Genetic::Network(&history, 1, 1);
+        for (int j = 0; j < 50; j++)
         {
             population[i]->mutate();
         }
     }
+
+    // for (int i = 0; i < pop_size; i++)
+    // {
+    //      std::cout << i << std::endl;
+    //      std::cout << *population[i] << std::endl;
+    // }
 
     float* data = new float(0.5);
     LL::LinkedList<float> input(data);
     // a typical game lasts 5000 steps
     for (int j = 0; j < 50; j++)
         for (int i = 0; i < pop_size; i++)
+        {
             population[i]->compute(input);
+        }
 
     // std::cout << *population[0] << std::endl;
     // std::cout << *population[1] << std::endl;

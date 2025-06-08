@@ -1,5 +1,5 @@
 #include "Genetic.hpp"
-#include <ostream>
+#include <iostream>
 
 namespace Genetic
 {
@@ -32,6 +32,10 @@ Node::Node(int innovationi, float biasi)
 float Node::activate()
 {
     LL::Node<Connection>* cur = in.head;
+
+    if (cur->data == nullptr)
+        return bias;
+
     float sum = bias;
 
     do
@@ -100,13 +104,13 @@ std::ostream& operator<<(std::ostream& os, Connection& con)
     return os;
 }
 
-Network::Network() : nodes(), connections(), innovation(-2)
+Network::Network(int* history) : nodes(), connections(), innovation(history)
 {
-    Node* input = new Node(innovation++, 0.0);
+    Node* input = new Node((*innovation)++, 0.0);
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>(input);
     nodes.push_back(inlist);
 
-    Node* output = new Node(innovation++, 0.0);
+    Node* output = new Node((*innovation)++, 0.0);
     LL::LinkedList<Node>* outlist = new LL::LinkedList<Node>(output);
     nodes.push_back(outlist);
 
@@ -114,13 +118,13 @@ Network::Network() : nodes(), connections(), innovation(-2)
     connections.push_back(conlist);
 }
 
-Network::Network(int n_inputs, int n_outputs)
-    : nodes(), connections(), innovation(-n_inputs - n_outputs)
+Network::Network(int* history, int n_inputs, int n_outputs)
+    : nodes(), connections(), innovation(history)
 {
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
     for (int i = 0; i < n_inputs; i++)
     {
-        Node* input = new Node(innovation++, 0.0);
+        Node* input = new Node((*innovation)++, 0.0);
         inlist->push_back(input);
     }
     nodes.push_back(inlist);
@@ -128,7 +132,7 @@ Network::Network(int n_inputs, int n_outputs)
     LL::LinkedList<Node>* outlist = new LL::LinkedList<Node>();
     for (int i = 0; i < n_outputs; i++)
     {
-        Node* output = new Node(innovation++, 0.0);
+        Node* output = new Node((*innovation)++, 0.0);
         outlist->push_back(output);
     }
     nodes.push_back(outlist);
@@ -139,7 +143,7 @@ Network::Network(int n_inputs, int n_outputs)
 
 void Network::addNode(Connection* con)
 {
-    Node* node = new Node(++innovation, 0);
+    Node* node = new Node((*innovation)++, 0);
 
     LL::Node<LL::LinkedList<Node>>* cur = nodes.head;
     int layer = 0;
@@ -220,7 +224,7 @@ void Network::addConnection(Node* input, Node* output, float weight)
     }
 
     Connection* con =
-        new Connection(++innovation, layer, weight, input, output);
+        new Connection((*innovation)++, layer, weight, input, output);
 
     // add the connection to the output connections of the input node
     LL::Node<Node>* incur = cur->data->head;
@@ -390,7 +394,6 @@ LL::LinkedList<float> Network::compute(LL::LinkedList<float> weights)
 
 std::ostream& operator<<(std::ostream& os, Network& net)
 {
-    os << "innovation: " << net.innovation << "\n";
     os << "nodes:\n" << net.nodes << "\n";
     os << "connections:\n" << net.connections << "\n";
 
