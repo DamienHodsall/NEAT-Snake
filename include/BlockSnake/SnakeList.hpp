@@ -13,31 +13,10 @@ enum Direction
     Down
 };
 
-class Node
+class SnakeList : public LL::LinkedList<Coordinate>
 {
    public:
-    Node(Node*, Node*, Coordinate);
-
-    Coordinate coord;
-    Node* next;
-    Node* prev;
-};
-
-class SnakeList
-{
-   public:
-    Node* head;
-    Node* tail;
-    int length;
-
-    SnakeList(Coordinate);
-
-    void push(Node*);
-    void pop();
-
     bool move(Direction);
-
-    friend std::ostream& operator<<(std::ostream&, SnakeList&);
 };
 
 #endif  // INCLUDE_BLOCKSNAKE_SNAKELIST_HPP_

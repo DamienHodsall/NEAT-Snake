@@ -1,12 +1,8 @@
 #include "Game.hpp"
 
-Game::Game(int w, int h)
-    : width(w),
-      height(h),
-      time(0),
-      snake(Coordinate(width / 2 - 1, height / 2)),
-      apple(-1, -1)
+Game::Game(int w, int h) : width(w), height(h), time(0), snake(), apple(-1, -1)
 {
+    snake.push_front(new Coordinate(width / 2 - 1, height / 2));
     snake.move(Right);
     snake.move(Right);
     generateApple();
@@ -22,31 +18,25 @@ void Game::generateApple()
 
 bool Game::collideApple()
 {
-    // this is the standard form of iteration through the snake
-    Node* cur = snake.head;
-
-    do {
-        if (cur->coord == apple)
-            return true;  // exit the loop early whenever possible
-    } while (cur = cur->next);
+    for (Coordinate pos : snake)
+        if (pos == apple)
+            return true;
 
     return false;
 }
 
 bool Game::collideWall()
 {
-    return ((snake.head->coord.x < 0) || (snake.head->coord.x >= width) ||
-            (snake.head->coord.y < 0) || (snake.head->coord.y >= height));
+    return ((snake.head->data->x < 0) || (snake.head->data->x >= width) ||
+            (snake.head->data->y < 0) || (snake.head->data->y >= height));
 }
 
 bool Game::collideSnake()
 {
-    Node* cur = snake.head->next;
-
-    do {
-        if (cur->coord == snake.head->coord)
+    LL::Node<Coordinate>* cur = snake.head;
+    while ((cur = cur->next))
+        if (snake.head == cur)
             return true;
-    } while (cur = cur->next);
 
     return false;
 }
@@ -58,8 +48,10 @@ bool Game::iterate(Direction action)
     if (collideApple())
     {
         generateApple();
-    } else {
-        snake.pop();
+    }
+    else
+    {
+        snake.pop_back();
     }
 
     time++;
