@@ -1,7 +1,8 @@
 #ifndef INCLUDE_BLOCKSNAKE_GENETIC_HPP_
 #define INCLUDE_BLOCKSNAKE_GENETIC_HPP_
 
-#include <bits/stdc++.h>
+#include <cstdlib>
+#include <ctime>
 
 #include "LinkedList.cpp"
 

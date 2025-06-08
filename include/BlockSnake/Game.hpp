@@ -1,8 +1,8 @@
 #ifndef INCLUDE_BLOCKSNAKE_GAME_HPP_
 #define INCLUDE_BLOCKSNAKE_GAME_HPP_
 
-#include <iostream>
-#include <bits/stdc++.h>
+#include <cstdlib>
+#include <ctime>
 
 #include "Coordinate.hpp"
 #include "SnakeList.hpp"

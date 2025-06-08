@@ -1,9 +1,8 @@
 #ifndef INCLUDE_BLOCKSNAKE_SNAKELIST_HPP_
 #define INCLUDE_BLOCKSNAKE_SNAKELIST_HPP_
 
-#include <ostream>
-
 #include "Coordinate.hpp"
+#include "LinkedList.cpp"
 
 enum Direction
 {

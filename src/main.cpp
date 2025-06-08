@@ -1,10 +1,11 @@
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
-#include <bits/stdc++.h>
 
-#include "Game.hpp"
-#include "SnakeList.hpp"
 #include "Coordinate.hpp"
+#include "Game.hpp"
 #include "Genetic.hpp"
+#include "SnakeList.hpp"
 
 int main()
 {
