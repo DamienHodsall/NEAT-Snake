@@ -231,3 +231,24 @@ TEST(LinkedListTests, rangeBasedLoop)
     for (float& val : test)
         EXPECT_FLOAT_EQ(tmps[i++], val);
 }
+
+TEST(LinkedListTests, copy)
+{
+    LL::LinkedList<float> test;
+
+    float tmps[3] = {0.5, 0.6, 0.7};
+
+    for (int i = 0; i < 3; i++)
+    {
+        float* tmp = new float(tmps[i]);
+        test.push_back(tmp);
+    }
+
+    LL::LinkedList<float> copy(test);
+
+    for (int i = 0; i < 3; i++)
+    {
+        EXPECT_FLOAT_EQ(*test.get(i)->data, *copy.get(i)->data);
+        EXPECT_NE(test.get(i), copy.get(i));
+    }
+}
