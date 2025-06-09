@@ -104,6 +104,21 @@ std::ostream& operator<<(std::ostream& os, Connection& con)
     return os;
 }
 
+Event::Event(Node* nodei) : innovation(nodei->innovation), a(-1), b(nodei->in.head->data->innovation), weight(&nodei->bias) {}
+Event::Event(Connection* coni) : innovation(coni->innovation), a(coni->in->innovation), b(coni->out->innovation), weight(&coni->weight) {}
+
+std::ostream& operator<<(std::ostream& os, Event& event)
+{
+    os << "{";
+    os << "I:" << event.innovation;
+    os << ", a:" << event.a;
+    os << ", b:" << event.b;
+    os << ", w:" << *event.weight;
+    os << "}";
+
+    return os;
+}
+
 Network::Network(int* history) : nodes(), connections(), innovation(history)
 {
     Node* input = new Node((*innovation)++, 0.0);
@@ -141,20 +156,126 @@ Network::Network(int* history, int n_inputs, int n_outputs)
     connections.push_back(conlist);
 }
 
-Network::Network(const Network& rhs)
+Network::Network(const Network& rhs) : nodes(), connections(), innovation(new int(0))
 {
-    // idek man, this is tough...
+    LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
+    for (int i = 0; i < rhs.nodes.head->data->length; i++)
+    {
+        Node* input = new Node((*innovation)++, 0.0);
+        inlist->push_back(input);
+    }
+    nodes.push_back(inlist);
 
-    int* hist = new int(0);
-    Network(hist, rhs.nodes.head->data->length, rhs.nodes.tail->data->length);
+    LL::LinkedList<Node>* outlist = new LL::LinkedList<Node>();
+    for (int i = 0; i < rhs.nodes.tail->data->length; i++)
+    {
+        Node* output = new Node((*innovation)++, 0.0);
+        outlist->push_back(output);
+    }
+    nodes.push_back(outlist);
+
+    LL::LinkedList<Connection>* conlist = new LL::LinkedList<Connection>();
+    connections.push_back(conlist);
+
+    bool skip = false;
 
     // then addConnection and addNode until finished
+    LL::Node<Event>* cureve = rhs.genome.head;
+    if (!cureve->data)
+        skip = true;
+    do
+    {
+        if (skip)
+        {
+            skip = false;
+        }
+        else
+        {
+            *innovation = cureve->data->innovation;
+
+            if (cureve->data->a < 0)
+            {
+                // find equivalent Connection in new Network
+                bool breaker = false;
+                LL::Node<LL::LinkedList<Connection>>* cur = connections.head;
+                LL::Node<Connection>* incur = cur->data->head;
+                do
+                {
+                    incur = cur->data->head;
+                    do
+                    {
+                        if (incur->data->innovation == cureve->data->b)
+                        {
+                            breaker = true;
+                            break;
+                        }
+                    } while (incur = incur->next);
+                    if (breaker)
+                        break;
+                } while (cur = cur->next);
+
+                addNode(incur->data, *cureve->data->weight);
+                skip = true;
+            }
+            else
+            {
+                // find equivalent in/out Nodes in new Network
+                bool breaker = false;
+                LL::Node<LL::LinkedList<Node>>* cur = nodes.head;
+                LL::Node<Node>* incur = cur->data->head;
+                do
+                {
+                    incur = cur->data->head;
+                    do
+                    {
+                        if (incur->data->innovation == cureve->data->a)
+                        {
+                            breaker = true;
+                            break;
+                        }
+                    } while (incur = incur->next);
+                    if (breaker)
+                        break;
+                } while (cur = cur->next);
+
+                breaker = false;
+                LL::Node<Node>* outcur = cur->data->head;
+                do
+                {
+                    if (cur->data)
+                    {
+                        outcur = cur->data->head;
+                        do
+                        {
+                            if (outcur->data)
+                            {
+                                if (outcur->data->innovation == cureve->data->b)
+                                {
+                                    breaker = true;
+                                    break;
+                                }
+                            }
+                        } while (outcur = outcur->next);
+                        if (breaker)
+                            break;
+                    }
+                } while (cur = cur->next);
+
+                addConnection(incur->data, outcur->data, *cureve->data->weight);
+            }
+        }
+    } while (cureve = cureve->next);
+
+    innovation = rhs.innovation;
 }
 
 
-void Network::addNode(Connection* con)
+void Network::addNode(Connection* con) {addNode(con, 0);}
+
+void Network::addNode(Connection* con, float weight)
 {
-    Node* node = new Node((*innovation)++, 0);
+    Node* node = new Node((*innovation)++, weight);
+    node->in.push_back(con);
 
     LL::Node<LL::LinkedList<Node>>* cur = nodes.head;
     int layer = 0;
@@ -200,6 +321,8 @@ void Network::addNode(Connection* con)
         cur->data->push_back(node);
     }
 
+    genome.push_back(new Event(node));
+
     addConnection(node, con->out, 1.0);
 
     // remove the old in connection from the con->out node
@@ -219,7 +342,6 @@ void Network::addNode(Connection* con)
     // modify the connection between con->in and con->out to be con->in-node and make a new connection with weight 1.0 new-node
 
     con->out = node;
-    node->in.push_back(con);
 }
 
 void Network::addConnection(Node* input, Node* output, float weight)
@@ -295,6 +417,8 @@ void Network::addConnection(Node* input, Node* output, float weight)
             break;
         }
     } while (incur = incur->next);
+
+    genome.push_back(new Event(con));
 }
 
 void Network::mutate()
@@ -405,6 +529,7 @@ LL::LinkedList<float> Network::compute(LL::LinkedList<float> weights)
 
 std::ostream& operator<<(std::ostream& os, Network& net)
 {
+    os << "genome:\n" << net.genome << "\n";
     os << "nodes:\n" << net.nodes << "\n";
     os << "connections:\n" << net.connections << "\n";
 

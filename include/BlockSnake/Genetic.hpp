@@ -45,18 +45,34 @@ class Connection
     friend std::ostream& operator<<(std::ostream&, Connection&);
 };
 
+class Event
+{
+   public:
+    int innovation;
+    int a;
+    int b;
+    float* weight;
+
+    Event(Node*);
+    Event(Connection*);
+
+    friend std::ostream& operator<<(std::ostream&, Event&);
+};
+
 class Network
 {
    public:
     LL::LinkedList<LL::LinkedList<Node>> nodes;
     LL::LinkedList<LL::LinkedList<Connection>> connections;
     int* innovation;
+    LL::LinkedList<Event> genome;
 
     Network(int*);
     Network(int*, int, int);
     Network(const Network&);
 
     void addNode(Connection*);
+    void addNode(Connection*, float);
     void addConnection(Node*, Node*, float);
     void mutate();
     LL::LinkedList<float> compute(LL::LinkedList<float>);
