@@ -104,8 +104,20 @@ std::ostream& operator<<(std::ostream& os, Connection& con)
     return os;
 }
 
-Event::Event(Node* nodei) : innovation(nodei->innovation), a(-1), b(nodei->in.head->data->innovation), weight(&nodei->bias) {}
-Event::Event(Connection* coni) : innovation(coni->innovation), a(coni->in->innovation), b(coni->out->innovation), weight(&coni->weight) {}
+Event::Event(Node* nodei)
+    : innovation(nodei->innovation),
+      a(-1),
+      b(nodei->in.head->data->innovation),
+      weight(&nodei->bias)
+{
+}
+Event::Event(Connection* coni)
+    : innovation(coni->innovation),
+      a(coni->in->innovation),
+      b(coni->out->innovation),
+      weight(&coni->weight)
+{
+}
 
 std::ostream& operator<<(std::ostream& os, Event& event)
 {
@@ -156,7 +168,8 @@ Network::Network(int* history, int n_inputs, int n_outputs)
     connections.push_back(conlist);
 }
 
-Network::Network(const Network& rhs) : nodes(), connections(), innovation(new int(0))
+Network::Network(const Network& rhs)
+    : nodes(), connections(), innovation(new int(0))
 {
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
     for (int i = 0; i < rhs.nodes.head->data->length; i++)
@@ -269,8 +282,10 @@ Network::Network(const Network& rhs) : nodes(), connections(), innovation(new in
     innovation = rhs.innovation;
 }
 
-
-void Network::addNode(Connection* con) {addNode(con, 0);}
+void Network::addNode(Connection* con)
+{
+    addNode(con, 0);
+}
 
 void Network::addNode(Connection* con, float weight)
 {
