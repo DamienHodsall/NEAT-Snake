@@ -445,7 +445,7 @@ void Network::mutate()
         if (rand() % 2)
         {
             // mutate a node weight
-            int layer = 1 + rand() % (nodes.length - 1);
+            int layer = 1 + rand() % (nodes.length - 2);
             LL::Node<LL::LinkedList<Node>>* nodelayer = nodes.get(layer);
             if (nodelayer->data->length > 0)
             {

@@ -138,16 +138,29 @@ TEST(GeneticTests, mutation)
 TEST(GeneticTests, population)
 {
     // go with 1000 for a realistic size
-    const int pop_size = 10;
+    const int pop_size = 100;
     int history = 0;
     Genetic::Network* population[pop_size];
+    population[0] = new Genetic::Network(&history, 3, 4);
+    for (int i = 1; i < pop_size; i++)
+        population[i] = new Genetic::Network(*population[0]);
 
-    for (int i = 0; i < pop_size; i++)
+    LL::LinkedList<float> input(new float(0.5));
+    input.push_back(new float(0.6));
+    input.push_back(new float(0.7));
+
+    // 150 generations
+    for (int i = 0; i < 100; i++)
     {
-        population[i] = new Genetic::Network(&history, 1, 1);
-        for (int j = 0; j < 50; j++)
+        for (int j = 0; j < pop_size; j++)
         {
-            population[i]->mutate();
+            // a typical game lasts 5000 steps
+            for (int k = 0; k < 500; k++)
+            {
+                population[j]->compute(input);
+                // std::cout << i << " " << j << " " << k << std::endl;
+            }
+            population[j]->mutate();
         }
     }
 
@@ -157,20 +170,9 @@ TEST(GeneticTests, population)
     //      std::cout << *population[i] << std::endl;
     // }
 
-    float* data = new float(0.5);
-    LL::LinkedList<float> input(data);
-    // a typical game lasts 5000 steps
-    for (int j = 0; j < 50; j++)
-    {
-        for (int i = 0; i < pop_size; i++)
-        {
-            population[i]->compute(input);
-        }
-    }
-
-    // for (int i = 0; i < pop_size; i++)
-    //     std::cout << population[i]->genome << std::endl;
-    std::cout << *population[3] << std::endl;
+    for (int i = 0; i < pop_size; i++)
+        std::cout << population[i]->genome.length << std::endl;
+    // std::cout << *population[6] << std::endl;
 
     // std::cout << *population[0] << std::endl;
     // std::cout << *population[1] << std::endl;
@@ -191,6 +193,6 @@ TEST(GeneticTests, copy)
     LL::LinkedList<float> input(new float(0.5));
     copy.compute(input);
 
-    std::cout << test << std::endl;
-    std::cout << copy << std::endl;
+    // std::cout << test << std::endl;
+    // std::cout << copy << std::endl;
 }
