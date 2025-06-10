@@ -80,6 +80,17 @@ class Network
     friend std::ostream& operator<<(std::ostream&, Network&);
 };
 
+class Population
+{
+   public:
+    int innovation;
+    LL::LinkedList<Event> history;
+    LL::LinkedList<Network> nets;
+
+    Population(int, int, int);
+    Population(int, Network*);
+};
+
 }  // namespace Genetic
 
 #endif  // INCLUDE_BLOCKSNAKE_GENETIC_HPP_

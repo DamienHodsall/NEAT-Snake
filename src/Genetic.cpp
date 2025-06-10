@@ -551,4 +551,26 @@ std::ostream& operator<<(std::ostream& os, Network& net)
     return os;
 }
 
+Population::Population(int pop_size, int n_inputs, int n_outputs)
+    : innovation(0),
+      history(),
+      nets(new Network(&innovation, n_inputs, n_outputs))
+{
+    Network* tmp = nets.head->data;
+
+    for (int i = 1; i < pop_size; i++)
+    {
+        nets.push_back(new Network(*tmp));
+    }
+}
+
+Population::Population(int pop_size, Network* tmp)
+    : innovation(0), history(), nets(new Network(*tmp))
+{
+    for (int i = 1; i < pop_size; i++)
+    {
+        nets.push_back(new Network(*tmp));
+    }
+}
+
 }  // namespace Genetic

@@ -135,7 +135,7 @@ TEST(GeneticTests, mutation)
     // std::cout << output << std::endl;
 }
 
-TEST(GeneticTests, population)
+TEST(GeneticTests, naivePopulation)
 {
     // go with 1000 for a realistic size
     const int pop_size = 100;
