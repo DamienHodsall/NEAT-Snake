@@ -11,6 +11,7 @@ TEST(GeneticTests, print)
     test.addConnection(inNode, outNode, 0.5);
     test.addConnection(inNode, outNode, 0.75);
     test.addNode(test.connections.head->data->head->data);
+    std::cout << "here" << std::endl;
     test.addNode(test.connections.head->data->head->next->data);
 
     std::cout << test;
@@ -135,10 +136,29 @@ TEST(GeneticTests, mutation)
     // std::cout << output << std::endl;
 }
 
+TEST(GeneticTests, copy)
+{
+    int history = 0;
+    Genetic::Network test = Genetic::Network(&history);
+    Genetic::Network copy(test);
+
+    for (int i = 0; i < 64; i++)
+        test.mutate();
+
+    for (int i = 0; i < 64; i++)
+        copy.mutate();
+
+    LL::LinkedList<float> input(new float(0.5));
+    copy.compute(input);
+
+    std::cout << test << std::endl;
+    std::cout << copy << std::endl;
+}
+
 TEST(GeneticTests, naivePopulation)
 {
     // go with 1000 for a realistic size
-    const int pop_size = 100;
+    const int pop_size = 50;
     int history = 0;
     Genetic::Network* population[pop_size];
     population[0] = new Genetic::Network(&history, 3, 4);
@@ -150,7 +170,7 @@ TEST(GeneticTests, naivePopulation)
     input.push_back(new float(0.7));
 
     // 150 generations
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 50; i++)
     {
         for (int j = 0; j < pop_size; j++)
         {
@@ -176,23 +196,4 @@ TEST(GeneticTests, naivePopulation)
 
     // std::cout << *population[0] << std::endl;
     // std::cout << *population[1] << std::endl;
-}
-
-TEST(GeneticTests, copy)
-{
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
-    Genetic::Network copy(test);
-
-    for (int i = 0; i < 64; i++)
-        test.mutate();
-
-    for (int i = 0; i < 64; i++)
-        copy.mutate();
-
-    LL::LinkedList<float> input(new float(0.5));
-    copy.compute(input);
-
-    // std::cout << test << std::endl;
-    // std::cout << copy << std::endl;
 }

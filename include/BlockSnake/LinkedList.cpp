@@ -4,7 +4,7 @@
 // sorry about the cursed cpp in the includes...
 // I was having some linker/cmake issues and this worked
 
-#include <ostream>
+#include <iostream>
 
 namespace LL
 {
@@ -44,7 +44,7 @@ class LinkedList
 
     friend std::ostream& operator<<(std::ostream& os, LinkedList& list)
     {
-        if (!list.head->data)
+        if (list.length == 0)
             return os << "[]";
 
         Node<T>* cur = list.head;
@@ -79,8 +79,8 @@ class LinkedList
         Node<T>* cur;
     };
 
-    Iterator begin() { return Iterator(head); }
-    Iterator end() { return Iterator(nullptr); }
+    Iterator begin() const { return Iterator(head); }
+    Iterator end() const { return Iterator(nullptr); }
 };
 
 // implementation here cause linking bull
@@ -96,7 +96,7 @@ Node<T>::Node(T* dat) : prev(nullptr), data(dat), next(nullptr){};
 template <typename T>
 LinkedList<T>::LinkedList()
 {
-    head = new Node<T>(nullptr);
+    head = nullptr;
     tail = head;
     length = 0;
 }
@@ -112,20 +112,26 @@ LinkedList<T>::LinkedList(T* start)
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T>& rhs)
 {
-    Node<T>* cur = rhs.head;
-    head = new Node<T>(new T(*cur->data));
-    tail = head;
-    length = 1;
+    // Node<T>* cur = rhs.head;
+    // head = new Node<T>(new T(*cur->data));
+    // tail = head;
+    // length = 1;
+    //
+    // // this is how iteration is done
+    // while (cur = cur->next)
+    //     push_back(new T(*cur->data));
 
-    while (cur = cur->next)
-        push_back(new T(*cur->data));
+    // can also be done like this
+    length = 0;
+    for (T& data : rhs)
+        push_back(new T(data));
 }
 
 template <typename T>
 void LinkedList<T>::push_front(T* data)
 {
     Node<T>* data_node = new Node<T>(data);
-    if (head->data)
+    if (length > 0)
     {
         head->prev = data_node;
         data_node->next = head;
@@ -143,7 +149,7 @@ template <typename T>
 void LinkedList<T>::push_back(T* data)
 {
     Node<T>* data_node = new Node<T>(data);
-    if (tail->data)
+    if (length > 0)
     {
         tail->next = data_node;
         data_node->prev = tail;
@@ -161,8 +167,9 @@ template <typename T>
 void LinkedList<T>::insert(T* data, int pos)
 {
     Node<T>* cur = head;
-    if (head->data)
+    if (head && head->data)
     {
+        // get to the right position
         int count = 0;
         while ((cur->next) && (count < pos))
         {
@@ -170,31 +177,26 @@ void LinkedList<T>::insert(T* data, int pos)
             count++;
         }
 
+        // if you got to the end of the list before the desired index
+        // maybe should throw an out of bounds...
         if (count < pos)
         {
             push_back(data);
             return;
         }
 
+        // if you're not at the first index
         if (cur->prev)
         {
             Node<T>* data_node = new Node<T>(cur->prev, data, cur);
 
             cur->prev->next = data_node;
             cur->prev = data_node;
-        }
-        else
-        {
-            push_front(data);
+            length++;
+            return;
         }
     }
-    else
-    {
-        Node<T>* data_node = new Node<T>(data);
-        head = data_node;
-        tail = head;
-    }
-    length++;
+    push_front(data);
 }
 
 template <typename T>

@@ -63,7 +63,7 @@ TEST(LinkedListTests, contains)
 
 TEST(LinkedListTests, empty)
 {
-    LL::LinkedList<float> test(nullptr);
+    LL::LinkedList<float> test;
 
     float tmps[2] = {0.5, 0.6};
 
@@ -79,7 +79,7 @@ TEST(LinkedListTests, empty)
 
 TEST(LinkedListTests, insert_in_order)
 {
-    LL::LinkedList<float> test(nullptr);
+    LL::LinkedList<float> test;
 
     float tmps[3] = {0.5, 0.6, 0.7};
 
@@ -96,7 +96,7 @@ TEST(LinkedListTests, insert_in_order)
 
 TEST(LinkedListTests, insert_out_of_order)
 {
-    LL::LinkedList<float> test(nullptr);
+    LL::LinkedList<float> test;
 
     float tmps[3] = {0.5, 0.6, 0.7};
 
@@ -113,7 +113,7 @@ TEST(LinkedListTests, insert_out_of_order)
 
 TEST(LinkedListTests, delete_node)
 {
-    LL::LinkedList<float> test(nullptr);
+    LL::LinkedList<float> test;
 
     float tmps[3] = {0.5, 0.6, 0.7};
 
@@ -128,12 +128,12 @@ TEST(LinkedListTests, delete_node)
     EXPECT_FLOAT_EQ(*(test.head->data), 0.6);
     EXPECT_FLOAT_EQ(*(test.head->next->data), 0.7);
 
-    std::cout << test << std::endl;
+    // std::cout << test << std::endl;
 }
 
 TEST(LinkedListTests, print)
 {
-    LL::LinkedList<float> test(nullptr);
+    LL::LinkedList<float> test;
     std::cout << test << std::endl;
 
     float tmps[3] = {0.5, 0.6, 0.7};
@@ -149,7 +149,7 @@ TEST(LinkedListTests, print)
 
 TEST(LinkedListTests, printCoordinate)
 {
-    LL::LinkedList<Coordinate> test(nullptr);
+    LL::LinkedList<Coordinate> test;
 
     Coordinate c1(1, 0);
     Coordinate c2(2, 0);
@@ -166,13 +166,13 @@ TEST(LinkedListTests, printCoordinate)
 
 TEST(LinkedListTests, printList)
 {
-    LL::LinkedList<LL::LinkedList<float>> test(nullptr);
+    LL::LinkedList<LL::LinkedList<float>> test;
 
     float tmps[3][3] = {{0.5, 0.6, 0.7}, {1.5, 1.6, 1.7}, {2.5, 2.6, 2.7}};
 
     for (int i = 0; i < 3; i++)
     {
-        LL::LinkedList<float>* tmp = new LL::LinkedList<float>(nullptr);
+        LL::LinkedList<float>* tmp = new LL::LinkedList<float>();
         for (int j = 0; j < 3; j++)
         {
             float* tmpf = new float(tmps[i][j]);
@@ -192,17 +192,13 @@ TEST(LinkedListTests, emptyConstructor)
     test.push_back(tmp);
     tmp = new float(0.6);
     test.push_front(tmp);
-    // k so don't do this or it clears the list?
-    // test.push_front(nullptr);
-    // ond really don't do this cause it segfaults???
-    // test.push_back(nullptr);
 
     std::cout << test << " " << test.length << std::endl;
 }
 
 TEST(LinkedListTests, get)
 {
-    LL::LinkedList<float> test(nullptr);
+    LL::LinkedList<float> test;
 
     float tmps[3] = {0.5, 0.6, 0.7};
 

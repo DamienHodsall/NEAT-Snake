@@ -5,38 +5,22 @@ namespace Genetic
 {
 
 Node::Node(int innovationi, float biasi, Connection* ini, Connection* outi)
-    : innovation(innovationi),
-      bias(biasi),
-      in(LL::LinkedList<Connection>(ini)),
-      out(LL::LinkedList<Connection>(outi)),
-      activation(0) {};
+    : innovation(innovationi), bias(biasi), in(ini), out(outi), activation(0) {
+      };
 Node::Node(int innovationi, float biasi, Connection* outi)
-    : innovation(innovationi),
-      bias(biasi),
-      in(LL::LinkedList<Connection>(nullptr)),
-      out(LL::LinkedList<Connection>(outi)),
-      activation(0) {};
+    : innovation(innovationi), bias(biasi), in(), out(outi), activation(0) {};
 Node::Node(int innovationi, Connection* ini, float biasi)
-    : innovation(innovationi),
-      bias(biasi),
-      in(LL::LinkedList<Connection>(ini)),
-      out(LL::LinkedList<Connection>(nullptr)),
-      activation(0) {};
+    : innovation(innovationi), bias(biasi), in(ini), out(), activation(0) {};
 Node::Node(int innovationi, float biasi)
-    : innovation(innovationi),
-      bias(biasi),
-      in(LL::LinkedList<Connection>(nullptr)),
-      out(LL::LinkedList<Connection>(nullptr)),
-      activation(0) {};
+    : innovation(innovationi), bias(biasi), in(), out(), activation(0) {};
 
 float Node::activate()
 {
-    LL::Node<Connection>* cur = in.head;
-
-    if (cur->data == nullptr)
+    if (in.length == 0)
         return bias;
 
     float sum = bias;
+    LL::Node<Connection>* cur = in.head;
 
     do
     {
@@ -53,10 +37,10 @@ std::ostream& operator<<(std::ostream& os, Node& node)
     os << "{";
     os << "I:" << node.innovation;
     os << ", b:" << node.bias;
-    LL::Node<Connection>* ccur = node.in.head;
     os << ", i:[";
-    if (ccur->data)
+    if (node.in.length > 0)
     {
+        LL::Node<Connection>* ccur = node.in.head;
         os << ccur->data->innovation;
         while (ccur = ccur->next)
         {
@@ -64,10 +48,10 @@ std::ostream& operator<<(std::ostream& os, Node& node)
         }
     }
     os << "]";
-    ccur = node.out.head;
     os << ", o:[";
-    if (ccur->data)
+    if (node.out.length > 0)
     {
+        LL::Node<Connection>* ccur = node.out.head;
         os << ccur->data->innovation;
         while (ccur = ccur->next)
         {
@@ -131,7 +115,8 @@ std::ostream& operator<<(std::ostream& os, Event& event)
     return os;
 }
 
-Network::Network(int* history) : nodes(), connections(), innovation(history)
+Network::Network(int* history)
+    : nodes(), connections(), innovation(history), genome()
 {
     Node* input = new Node((*innovation)++, 0.0);
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>(input);
@@ -146,7 +131,7 @@ Network::Network(int* history) : nodes(), connections(), innovation(history)
 }
 
 Network::Network(int* history, int n_inputs, int n_outputs)
-    : nodes(), connections(), innovation(history)
+    : nodes(), connections(), innovation(history), genome()
 {
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
     for (int i = 0; i < n_inputs; i++)
@@ -169,7 +154,7 @@ Network::Network(int* history, int n_inputs, int n_outputs)
 }
 
 Network::Network(const Network& rhs)
-    : nodes(), connections(), innovation(new int(0))
+    : nodes(), connections(), innovation(new int(0)), genome()
 {
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
     for (int i = 0; i < rhs.nodes.head->data->length; i++)
@@ -192,10 +177,14 @@ Network::Network(const Network& rhs)
 
     bool skip = false;
 
+    if (rhs.genome.length == 0)
+    {
+        innovation = rhs.innovation;
+        return;
+    }
+
     // then addConnection and addNode until finished
     LL::Node<Event>* cureve = rhs.genome.head;
-    if (!cureve->data)
-        skip = true;
     do
     {
         if (skip)
@@ -255,23 +244,17 @@ Network::Network(const Network& rhs)
                 LL::Node<Node>* outcur = cur->data->head;
                 do
                 {
-                    if (cur->data)
+                    outcur = cur->data->head;
+                    do
                     {
-                        outcur = cur->data->head;
-                        do
+                        if (outcur->data->innovation == cureve->data->b)
                         {
-                            if (outcur->data)
-                            {
-                                if (outcur->data->innovation == cureve->data->b)
-                                {
-                                    breaker = true;
-                                    break;
-                                }
-                            }
-                        } while (outcur = outcur->next);
-                        if (breaker)
+                            breaker = true;
                             break;
-                    }
+                        }
+                    } while (outcur = outcur->next);
+                    if (breaker)
+                        break;
                 } while (cur = cur->next);
 
                 addConnection(incur->data, outcur->data, *cureve->data->weight);
@@ -321,13 +304,10 @@ void Network::addNode(Connection* con, float weight)
             if (ccur->data->head->data->layer >= layer)
             {
                 inccur = ccur->data->head;
-                if (inccur->data)
+                do
                 {
-                    do
-                    {
-                        inccur->data->layer++;
-                    } while (inccur = inccur->next);
-                }
+                    inccur->data->layer++;
+                } while (inccur = inccur->next);
             }
         } while (ccur = ccur->next);
     }
@@ -388,7 +368,7 @@ void Network::addConnection(Node* input, Node* output, float weight)
 
     LL::Node<LL::LinkedList<Connection>>* ccur = connections.head;
 
-    if (!(ccur->data->head->data))
+    if (!(ccur->data->length > 0))
     {
         ccur->data->push_back(con);
     }
@@ -447,13 +427,10 @@ void Network::mutate()
             // mutate a node weight
             int layer = 1 + rand() % (nodes.length - 2);
             LL::Node<LL::LinkedList<Node>>* nodelayer = nodes.get(layer);
-            if (nodelayer->data->length > 0)
-            {
-                LL::Node<Node>* node =
-                    nodelayer->data->get(rand() % nodelayer->data->length);
-                float dbias = 1.0 - 2.0 * ((0.1 * rand()) / RAND_MAX);
-                node->data->bias += dbias;
-            }
+            LL::Node<Node>* node =
+                nodelayer->data->get(rand() % nodelayer->data->length);
+            float dbias = 1.0 - 2.0 * ((0.1 * rand()) / RAND_MAX);
+            node->data->bias += dbias;
         }
         else
         {
@@ -517,21 +494,15 @@ LL::LinkedList<float> Network::compute(LL::LinkedList<float> weights)
     // call Node.activate() on each node in each layer IN ORDER
     while (cur = cur->next)
     {
-        if (cur->data)
+        incur = cur->data->head;
+        do
         {
-            incur = cur->data->head;
-            if (incur->data)
-            {
-                do
-                {
-                    incur->data->activate();
-                } while (incur = incur->next);
-            }
-        }
+            incur->data->activate();
+        } while (incur = incur->next);
     }
 
     // add the output node activations to the return list
-    LL::LinkedList<float> output(nullptr);
+    LL::LinkedList<float> output;
     incur = nodes.tail->data->head;
     do
     {
@@ -545,8 +516,8 @@ LL::LinkedList<float> Network::compute(LL::LinkedList<float> weights)
 std::ostream& operator<<(std::ostream& os, Network& net)
 {
     os << "genome:\n" << net.genome << "\n";
-    os << "nodes:\n" << net.nodes << "\n";
-    os << "connections:\n" << net.connections << "\n";
+    // os << "nodes:\n" << net.nodes << "\n";
+    // os << "connections:\n" << net.connections << "\n";
 
     return os;
 }
