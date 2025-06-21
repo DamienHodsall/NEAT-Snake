@@ -12,7 +12,6 @@ TEST(GeneticTests, print)
     test.addConnection(inNode, outNode, 0.5);
     test.addConnection(inNode, outNode, 0.75);
     test.addNode(test.connections.head->data->head->data);
-    std::cout << "here" << std::endl;
     test.addNode(test.connections.head->data->head->next->data);
 
     std::cout << test;
@@ -29,7 +28,6 @@ TEST(GeneticTests, simple)
     float* input = new float(0.75);
     LL::LinkedList<float> inputs(input);
     LL::LinkedList<float> outputs = test.compute(inputs);
-    std::cout << "got here" << std::endl;
 
     EXPECT_FLOAT_EQ(0.5 * 0.75, *(outputs.head->data));
 }

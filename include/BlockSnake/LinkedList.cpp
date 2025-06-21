@@ -33,7 +33,6 @@ class LinkedList
     LinkedList();
     LinkedList(T*);
     LinkedList(const LinkedList<T>&);
-    ~LinkedList();
     void push_front(T*);
     void push_back(T*);
     void insert(T*, int);
@@ -113,28 +112,21 @@ LinkedList<T>::LinkedList(T* start)
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T>& rhs)
 {
-    // Node<T>* cur = rhs.head;
-    // head = new Node<T>(new T(*cur->data));
-    // tail = head;
-    // length = 1;
-    //
-    // // this is how iteration is done
-    // while (cur = cur->next)
-    //     push_back(new T(*cur->data));
+    Node<T>* cur = rhs.head;
+    head = new Node<T>(new T(*cur->data));
+    tail = head;
+    length = 1;
+
+    // this is how iteration is done
+    while (cur = cur->next)
+        push_back(new T(*cur->data));
 
     // can also be done like this
-    length = 0;
-    for (T& data : rhs)
-        push_back(new T(data));
-}
-
-template <typename T>
-LinkedList<T>::~LinkedList()
-{
-    for (int i = 0; i < length; i++)
-    {
-        pop_front();
-    }
+    // head = nullptr;
+    // tail = nullptr;
+    // length = 0;
+    // for (T& data : rhs)
+    //     push_back(new T(data));
 }
 
 template <typename T>

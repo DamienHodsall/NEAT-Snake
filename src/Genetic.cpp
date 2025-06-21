@@ -1,4 +1,5 @@
 #include "Genetic.hpp"
+#include <cmath>
 #include <iostream>
 
 namespace Genetic
@@ -434,13 +435,15 @@ void Network::addConnection(Node* input, Node* output, float weight)
 
 void Network::mutate()
 {
-    // TODO some random stuff ig
     if (rand() < 0.8 * RAND_MAX)
     {
         // mutate a weight
         if (rand() % 2)
         {
             // mutate a node weight
+            if (nodes.length < 3)
+                return;  // there are no hidden layers to modify
+
             int layer = 1 + rand() % (nodes.length - 2);
             LL::Node<LL::LinkedList<Node>>* nodelayer = nodes.get(layer);
             LL::Node<Node>* node =
@@ -496,7 +499,7 @@ void Network::mutate()
     }
 }
 
-LL::LinkedList<float> Network::compute(LL::LinkedList<float> weights)
+LL::LinkedList<float> Network::compute(LL::LinkedList<float>& weights)
 {
     // assign the given inputs to the input layer
     LL::Node<LL::LinkedList<Node>>* cur = nodes.head;
@@ -525,7 +528,6 @@ LL::LinkedList<float> Network::compute(LL::LinkedList<float> weights)
         float* tmp = new float(incur->data->activation);
         output.push_back(tmp);
     } while (incur = incur->next);
-    std::cout << "here" << std::endl;
 
     return output;
 }

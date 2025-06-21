@@ -76,7 +76,7 @@ class Network
     void addNode(Connection*, float);
     void addConnection(Node*, Node*, float);
     void mutate();
-    LL::LinkedList<float> compute(LL::LinkedList<float>);
+    LL::LinkedList<float> compute(LL::LinkedList<float>&);
 
     friend std::ostream& operator<<(std::ostream&, Network&);
 };
