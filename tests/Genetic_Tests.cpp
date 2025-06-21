@@ -4,8 +4,9 @@
 
 TEST(GeneticTests, print)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
     Genetic::Node* inNode = test.nodes.head->data->head->data;
     Genetic::Node* outNode = test.nodes.tail->data->head->data;
     test.addConnection(inNode, outNode, 0.5);
@@ -19,22 +20,25 @@ TEST(GeneticTests, print)
 
 TEST(GeneticTests, simple)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.5);
 
     float* input = new float(0.75);
     LL::LinkedList<float> inputs(input);
     LL::LinkedList<float> outputs = test.compute(inputs);
+    std::cout << "got here" << std::endl;
 
     EXPECT_FLOAT_EQ(0.5 * 0.75, *(outputs.head->data));
 }
 
 TEST(GeneticTests, nodeLists)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
 
     Genetic::Node* inNode = test.nodes.head->data->head->data;
     Genetic::Node* outNode = test.nodes.tail->data->head->data;
@@ -45,8 +49,9 @@ TEST(GeneticTests, nodeLists)
 
 TEST(GeneticTests, networkI1C2O1)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.5);
     test.addConnection(test.nodes.head->data->head->data,
@@ -61,8 +66,9 @@ TEST(GeneticTests, networkI1C2O1)
 
 TEST(GeneticTests, networkI2C1O1)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history, 2, 1);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history, 2, 1);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.5);
     test.addConnection(test.nodes.head->data->head->next->data,
@@ -79,8 +85,9 @@ TEST(GeneticTests, networkI2C1O1)
 
 TEST(GeneticTests, networkI1C1H1C1O1)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.25);
     test.addNode(test.connections.head->data->head->data);
@@ -94,8 +101,9 @@ TEST(GeneticTests, networkI1C1H1C1O1)
 
 TEST(GeneticTests, networkI1C1H2C1O1)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.25);
     test.addNode(test.connections.head->data->head->data);
@@ -112,8 +120,9 @@ TEST(GeneticTests, networkI1C1H2C1O1)
 
 TEST(GeneticTests, mutation)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
     test.addConnection(test.nodes.head->data->head->data,
                        test.nodes.tail->data->head->data, 0.25);
     std::cout << test.nodes.length << std::endl;
@@ -138,8 +147,9 @@ TEST(GeneticTests, mutation)
 
 TEST(GeneticTests, copy)
 {
-    int history = 0;
-    Genetic::Network test = Genetic::Network(&history);
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
+    Genetic::Network test = Genetic::Network(&innovation, &history);
     Genetic::Network copy(test);
 
     for (int i = 0; i < 64; i++)
@@ -159,9 +169,10 @@ TEST(GeneticTests, naivePopulation)
 {
     // go with 1000 for a realistic size
     const int pop_size = 50;
-    int history = 0;
+    int innovation = 0;
+    LL::LinkedList<Genetic::Event> history;
     Genetic::Network* population[pop_size];
-    population[0] = new Genetic::Network(&history, 3, 4);
+    population[0] = new Genetic::Network(&innovation, &history, 3, 4);
     for (int i = 1; i < pop_size; i++)
         population[i] = new Genetic::Network(*population[0]);
 

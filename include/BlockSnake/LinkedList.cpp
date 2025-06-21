@@ -33,6 +33,7 @@ class LinkedList
     LinkedList();
     LinkedList(T*);
     LinkedList(const LinkedList<T>&);
+    ~LinkedList();
     void push_front(T*);
     void push_back(T*);
     void insert(T*, int);
@@ -128,6 +129,15 @@ LinkedList<T>::LinkedList(const LinkedList<T>& rhs)
 }
 
 template <typename T>
+LinkedList<T>::~LinkedList()
+{
+    for (int i = 0; i < length; i++)
+    {
+        pop_front();
+    }
+}
+
+template <typename T>
 void LinkedList<T>::push_front(T* data)
 {
     Node<T>* data_node = new Node<T>(data);
@@ -167,7 +177,7 @@ template <typename T>
 void LinkedList<T>::insert(T* data, int pos)
 {
     Node<T>* cur = head;
-    if (head && head->data)
+    if (length > 0)
     {
         // get to the right position
         int count = 0;
@@ -202,7 +212,7 @@ void LinkedList<T>::insert(T* data, int pos)
 template <typename T>
 void LinkedList<T>::pop_front()
 {
-    if (!head->data)
+    if (length == 0)
         return;
 
     head = head->next;
@@ -214,7 +224,7 @@ void LinkedList<T>::pop_front()
 template <typename T>
 void LinkedList<T>::pop_back()
 {
-    if (!tail->data)
+    if (length == 0)
         return;
 
     tail = tail->prev;
@@ -243,7 +253,7 @@ void LinkedList<T>::remove(Node<T>* node)
 template <typename T>
 bool LinkedList<T>::contains(T* test)
 {
-    if (!head->data)
+    if (!head)
         return false;
 
     Node<T>* cur = head;

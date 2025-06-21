@@ -115,8 +115,12 @@ std::ostream& operator<<(std::ostream& os, Event& event)
     return os;
 }
 
-Network::Network(int* history)
-    : nodes(), connections(), innovation(history), genome()
+Network::Network(int* innovationi, LL::LinkedList<Event>* historyi)
+    : nodes(),
+      connections(),
+      innovation(innovationi),
+      genome(),
+      history(historyi)
 {
     Node* input = new Node((*innovation)++, 0.0);
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>(input);
@@ -130,8 +134,13 @@ Network::Network(int* history)
     connections.push_back(conlist);
 }
 
-Network::Network(int* history, int n_inputs, int n_outputs)
-    : nodes(), connections(), innovation(history), genome()
+Network::Network(int* innovationi, LL::LinkedList<Event>* historyi,
+                 int n_inputs, int n_outputs)
+    : nodes(),
+      connections(),
+      innovation(innovationi),
+      genome(),
+      history(historyi)
 {
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
     for (int i = 0; i < n_inputs; i++)
@@ -154,7 +163,11 @@ Network::Network(int* history, int n_inputs, int n_outputs)
 }
 
 Network::Network(const Network& rhs)
-    : nodes(), connections(), innovation(new int(0)), genome()
+    : nodes(),
+      connections(),
+      innovation(new int(0)),
+      genome(),
+      history(new LL::LinkedList<Event>)
 {
     LL::LinkedList<Node>* inlist = new LL::LinkedList<Node>();
     for (int i = 0; i < rhs.nodes.head->data->length; i++)
@@ -262,7 +275,10 @@ Network::Network(const Network& rhs)
         }
     } while (cureve = cureve->next);
 
+    delete innovation;
+    delete history;
     innovation = rhs.innovation;
+    history = rhs.history;
 }
 
 void Network::addNode(Connection* con)
@@ -509,6 +525,7 @@ LL::LinkedList<float> Network::compute(LL::LinkedList<float> weights)
         float* tmp = new float(incur->data->activation);
         output.push_back(tmp);
     } while (incur = incur->next);
+    std::cout << "here" << std::endl;
 
     return output;
 }
@@ -525,19 +542,10 @@ std::ostream& operator<<(std::ostream& os, Network& net)
 Population::Population(int pop_size, int n_inputs, int n_outputs)
     : innovation(0),
       history(),
-      nets(new Network(&innovation, n_inputs, n_outputs))
+      nets(new Network(&innovation, &history, n_inputs, n_outputs))
 {
     Network* tmp = nets.head->data;
 
-    for (int i = 1; i < pop_size; i++)
-    {
-        nets.push_back(new Network(*tmp));
-    }
-}
-
-Population::Population(int pop_size, Network* tmp)
-    : innovation(0), history(), nets(new Network(*tmp))
-{
     for (int i = 1; i < pop_size; i++)
     {
         nets.push_back(new Network(*tmp));

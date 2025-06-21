@@ -66,9 +66,10 @@ class Network
     LL::LinkedList<LL::LinkedList<Connection>> connections;
     int* innovation;
     LL::LinkedList<Event> genome;
+    LL::LinkedList<Event>* history;
 
-    Network(int*);
-    Network(int*, int, int);
+    Network(int*, LL::LinkedList<Event>*);
+    Network(int*, LL::LinkedList<Event>*, int, int);
     Network(const Network&);
 
     void addNode(Connection*);
@@ -88,7 +89,6 @@ class Population
     LL::LinkedList<Network> nets;
 
     Population(int, int, int);
-    Population(int, Network*);
 };
 
 }  // namespace Genetic
