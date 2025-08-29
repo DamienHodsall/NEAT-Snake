@@ -39,6 +39,7 @@ class LinkedList
     void pop_front();
     void pop_back();
     void remove(Node<T>*);
+    void destroy(Node<T>*);
     bool contains(T*);
     Node<T>* get(int);
 
@@ -50,7 +51,7 @@ class LinkedList
         Node<T>* cur = list.head;
         os << "[";
         os << *(cur->data);
-        while (cur = cur->next)
+        while ((cur = cur->next))
         {
             os << "," << *(cur->data);
         }
@@ -118,7 +119,7 @@ LinkedList<T>::LinkedList(const LinkedList<T>& rhs)
     length = 1;
 
     // this is how iteration is done
-    while (cur = cur->next)
+    while ((cur = cur->next))
         push_back(new T(*cur->data));
 
     // can also be done like this
@@ -243,6 +244,25 @@ void LinkedList<T>::remove(Node<T>* node)
 }
 
 template <typename T>
+void LinkedList<T>::destroy(Node<T>* node)
+{
+    if (node == head)
+        head = node->next;
+    else
+        node->prev->next = node->next;
+
+    if (node == tail)
+        tail = node->prev;
+    else
+        node->next->prev = node->prev;
+
+    delete (node->data);
+    delete (node);
+    length--;
+}
+
+// replace with isMember(T* test) and make contains(T* test) check the value
+template <typename T>
 bool LinkedList<T>::contains(T* test)
 {
     if (!head)
@@ -254,7 +274,7 @@ bool LinkedList<T>::contains(T* test)
         // this "accidently" checks the pointers but it's all pointers anyway
         if (cur->data == test)
             return true;
-    } while (cur = cur->next);
+    } while ((cur = cur->next));
 
     return false;
 }

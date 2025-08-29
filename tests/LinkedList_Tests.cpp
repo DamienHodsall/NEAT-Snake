@@ -111,7 +111,7 @@ TEST(LinkedListTests, insert_out_of_order)
     EXPECT_FLOAT_EQ(*(test.head->next->next->data), 0.6);
 }
 
-TEST(LinkedListTests, delete_node)
+TEST(LinkedListTests, remove_node)
 {
     LL::LinkedList<float> test;
 
@@ -123,12 +123,42 @@ TEST(LinkedListTests, delete_node)
         test.push_back(tmp);
     }
 
+    float* data = test.head->data;
+    LL::Node<float>* head = test.head;
+
     test.remove(test.head);
 
     EXPECT_FLOAT_EQ(*(test.head->data), 0.6);
     EXPECT_FLOAT_EQ(*(test.head->next->data), 0.7);
 
     // std::cout << test << std::endl;
+    std::cout << head->data << std::endl;
+    std::cout << data << std::endl;
+}
+
+TEST(LinkedListTests, destroy_node)
+{
+    LL::LinkedList<float> test;
+
+    float tmps[3] = {0.5, 0.6, 0.7};
+
+    for (int i = 0; i < 3; i++)
+    {
+        float* tmp = new float(tmps[i]);
+        test.push_back(tmp);
+    }
+
+    float* data = test.head->data;
+    LL::Node<float>* head = test.head;
+
+    test.destroy(test.head);
+
+    EXPECT_FLOAT_EQ(*(test.head->data), 0.6);
+    EXPECT_FLOAT_EQ(*(test.head->next->data), 0.7);
+
+    // std::cout << test << std::endl;
+    std::cout << head->data << std::endl;
+    std::cout << data << std::endl;
 }
 
 TEST(LinkedListTests, print)
