@@ -1,208 +1,289 @@
 #include <gtest/gtest.h>
+#include <fstream>
+#include <numeric>
 
 #include "Genetic.hpp"
 
+template <typename T>
+std::ostream& operator<<(std::ostream& os, std::list<T>& l)
+{
+    if (l.empty())
+        return os << "[]";
+
+    os << "[";
+    typename std::list<T>::iterator it = l.begin();
+    os << *it;
+    it = std::next(it);
+    while (it != l.end())
+    {
+        os << "," << *it;
+        it = std::next(it);
+    }
+    os << "]";
+
+    return os;
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, std::vector<T>& l)
+{
+    if (l.empty())
+        return os << "[]";
+
+    os << "[";
+    typename std::vector<T>::iterator it = l.begin();
+    os << *it;
+    it = std::next(it);
+    while (it != l.end())
+    {
+        os << "," << *it;
+        it = std::next(it);
+    }
+    os << "]";
+
+    return os;
+}
+
+// std::cout << "got here" << std::endl;
+
 TEST(GeneticTests, print)
 {
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-    Genetic::Node* inNode = test.nodes.head->data->head->data;
-    Genetic::Node* outNode = test.nodes.tail->data->head->data;
-    test.addConnection(inNode, outNode, 0.5);
-    test.addConnection(inNode, outNode, 0.75);
-    test.addNode(test.connections.head->data->head->data);
-    test.addNode(test.connections.head->data->head->next->data);
-
-    std::cout << test;
-}
-
-TEST(GeneticTests, simple)
-{
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.tail->data->head->data, 0.5);
-
-    float* input = new float(0.75);
-    LL::LinkedList<float> inputs(input);
-    LL::LinkedList<float> outputs = test.compute(inputs);
-
-    EXPECT_FLOAT_EQ(0.5 * 0.75, *(outputs.head->data));
-}
-
-TEST(GeneticTests, nodeLists)
-{
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-
-    Genetic::Node* inNode = test.nodes.head->data->head->data;
-    Genetic::Node* outNode = test.nodes.tail->data->head->data;
-    test.addConnection(inNode, outNode, 0.5);
-
-    EXPECT_EQ(inNode->out.head->data, outNode->in.head->data);
-}
-
-TEST(GeneticTests, networkI1C2O1)
-{
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.tail->data->head->data, 0.5);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.tail->data->head->data, 0.75);
-
-    float* input = new float(0.75);
-    LL::LinkedList<float> inputs(input);
-    LL::LinkedList<float> outputs = test.compute(inputs);
-
-    EXPECT_FLOAT_EQ((0.5 + 0.75) * 0.75, *(outputs.head->data));
-}
-
-TEST(GeneticTests, networkI2C1O1)
-{
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history, 2, 1);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.tail->data->head->data, 0.5);
-    test.addConnection(test.nodes.head->data->head->next->data,
-                       test.nodes.tail->data->head->data, 0.90);
-
-    float* input = new float(0.75);
-    LL::LinkedList<float> inputs(input);
-    float* tmp = new float(0.25);
-    inputs.push_back(tmp);
-    LL::LinkedList<float> outputs = test.compute(inputs);
-
-    EXPECT_FLOAT_EQ(0.75 * 0.5 + 0.25 * 0.90, *(outputs.head->data));
-}
-
-TEST(GeneticTests, networkI1C1H1C1O1)
-{
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.tail->data->head->data, 0.25);
-    test.addNode(test.connections.head->data->head->data);
-
-    float* input = new float(0.90);
-    LL::LinkedList<float> inputs(input);
-    LL::LinkedList<float> outputs = test.compute(inputs);
-
-    EXPECT_FLOAT_EQ(0.90 * 0.25, *(outputs.head->data));
-}
-
-TEST(GeneticTests, networkI1C1H2C1O1)
-{
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.tail->data->head->data, 0.25);
-    test.addNode(test.connections.head->data->head->data);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.head->next->data->head->data, 0.35);
-    test.addNode(test.connections.head->data->head->next->data);
-
-    float* input = new float(0.90);
-    LL::LinkedList<float> inputs(input);
-    LL::LinkedList<float> outputs = test.compute(inputs);
-
-    EXPECT_FLOAT_EQ(0.90 * 0.35 + 0.90 * 0.25, *(outputs.head->data));
-}
-
-TEST(GeneticTests, mutation)
-{
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-    test.addConnection(test.nodes.head->data->head->data,
-                       test.nodes.tail->data->head->data, 0.25);
-    std::cout << test.nodes.length << std::endl;
-
-    for (int i = 0; i < 1000; i++)
-        test.mutate();
-
-    float* data = new float(0.5);
-    LL::LinkedList<float> input(data);
+    Genetic::Population population(1, 1, 1);
+    Genetic::Network& test = population.nets.front();
+    Genetic::Node* inNode = &test.nodes.front().front();
+    Genetic::Node* outNode = &test.nodes.back().front();
+    population.history.clear();  // fake round of mutation
     std::cout << test << std::endl;
 
-    LL::Node<LL::LinkedList<Genetic::Node>>* cur = test.nodes.head;
-    std::cout << cur->data->length;
-    while (cur = cur->next)
-    {
-        std::cout << ", " << cur->data->length;
-    }
-    std::cout << std::endl;
-    // LL::LinkedList<float> output = test.compute(input);
-    // std::cout << output << std::endl;
+    test.addConnection(inNode, outNode, 0.5);
+    test.addNode(&test.connections.front().front());
+    population.history.clear();  // fake round of mutation
+    test.addConnection(inNode, outNode, 0.75);
+    test.addNode(&test.connections.front().back());
+
+    std::cout << test << std::endl;
 }
 
-TEST(GeneticTests, copy)
+TEST(GeneticTests, compute)
 {
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network test = Genetic::Network(&innovation, &history);
-    Genetic::Network copy(test);
+    Genetic::Population population(1, 3, 4);
+    Genetic::Network& test = population.nets.front();
+    std::list<float> input = {0.5, 0.6, 0.7};
+    std::list<float> output = test.compute(input);
+
+    std::cout << "before mutation:" << std::endl;
+    std::cout << test << std::endl;
+    std::cout << output << std::endl;
+
+    for (int i = 0; i < 50; i++)
+        population.mutate();
+
+    output = test.compute(input);
+    std::cout << "after mutation:" << std::endl;
+    std::cout << test << std::endl;
+    std::cout << output << std::endl;
+}
+
+TEST(GeneticTests, copyNetwork)
+{
+    // initial population is copies of first member
+    Genetic::Population pop(2, 1, 1);
+    Genetic::Network& test = pop.nets.front();
+    Genetic::Network& copy = pop.nets.back();
+
+    std::cout << test << std::endl;
+    std::cout << copy << std::endl;
 
     for (int i = 0; i < 64; i++)
-        test.mutate();
+        pop.mutate();
+    std::cout << "got here" << std::endl;
 
-    for (int i = 0; i < 64; i++)
-        copy.mutate();
-
-    LL::LinkedList<float> input(new float(0.5));
+    std::list<float> input = {0.5};
     copy.compute(input);
 
     std::cout << test << std::endl;
     std::cout << copy << std::endl;
 }
 
-TEST(GeneticTests, naivePopulation)
+TEST(GeneticTests, mutation)
 {
-    // go with 1000 for a realistic size
-    const int pop_size = 50;
-    int innovation = 0;
-    LL::LinkedList<Genetic::Event> history;
-    Genetic::Network* population[pop_size];
-    population[0] = new Genetic::Network(&innovation, &history, 3, 4);
-    for (int i = 1; i < pop_size; i++)
-        population[i] = new Genetic::Network(*population[0]);
+    Genetic::Population population(25, 1, 1);
 
-    LL::LinkedList<float> input(new float(0.5));
-    input.push_back(new float(0.6));
-    input.push_back(new float(0.7));
+    for (int i = 0; i < 125; i++)
+        population.mutate();
 
-    // 150 generations
-    for (int i = 0; i < 50; i++)
+    std::cout << population.nets.front() << std::endl;
+    std::cout << population.history << std::endl;
+    std::cout << population.innovation << std::endl;
+}
+
+TEST(GeneticTests, Speciation)
+{
+    Genetic::Population pop(50, 3, 4);
+    pop.ct = 1.0;
+
+    for (int i = 0; i < 25; i++)
     {
-        for (int j = 0; j < pop_size; j++)
-        {
-            // a typical game lasts 5000 steps
-            for (int k = 0; k < 500; k++)
-            {
-                population[j]->compute(input);
-                // std::cout << i << " " << j << " " << k << std::endl;
-            }
-            population[j]->mutate();
-        }
+        std::cout << pop.history << std::endl;
+        std::cout << pop.species << std::endl;
+        // std::cout << pop.species.size() << " | " << pop.history << std::endl;
+
+        pop.mutate();
     }
 
-    // for (int i = 0; i < pop_size; i++)
-    // {
-    //      std::cout << i << std::endl;
-    //      std::cout << *population[i] << std::endl;
-    // }
+    std::cout << pop.history << std::endl;
+    std::cout << pop.species << std::endl;
+    // std::cout << pop.species.size() << " | " << pop.history << std::endl;
+}
 
-    for (int i = 0; i < pop_size; i++)
-        std::cout << population[i]->genome.length << std::endl;
-    // std::cout << *population[6] << std::endl;
+TEST(GeneticTests, PopulationHistory)
+{
+    Genetic::Population pop(15, 2, 2);
 
-    // std::cout << *population[0] << std::endl;
-    // std::cout << *population[1] << std::endl;
+    std::cout << pop.history << std::endl;
+
+    for (int i = 0; i < 10; i++)
+    {
+        pop.mutate();
+        std::cout << pop.history << std::endl;
+    }
+}
+
+TEST(GeneticTests, Compatibility)
+{
+    Genetic::Population pop(3, 2, 2);
+    Genetic::Network& net1 = pop.nets.front();
+    Genetic::Network& net2 = *(++pop.nets.begin());
+    Genetic::Network& net3 = pop.nets.back();
+    std::cout << pop.compatibility(net1, net2) << std::endl;
+
+    // for (int i = 0; i < 50; i++)
+    //     pop.mutate();
+
+    // designed networks that differ by a single connection
+    pop.history.clear();
+    net1.addConnection(&net1.nodes.front().front(), &net1.nodes.back().front(),
+                       0.3);
+    net1.addNode(&net1.connections.front().front());
+    net1.connections.back().front().weight = 0.4;
+    net1.addConnection(&net1.nodes.front().back(), &net1.nodes.back().back(),
+                       0.5);
+    net1.addConnection(&net1.nodes.front().back(),
+                       &(++net1.nodes.begin())->front(), 0.7);
+
+    net2.addConnection(&net2.nodes.front().front(), &net2.nodes.back().front(),
+                       0.3);
+    net2.addNode(&net2.connections.front().front());
+    net2.connections.back().front().weight = 0.4;
+    net2.addConnection(&net2.nodes.front().back(), &net2.nodes.back().back(),
+                       0.5);
+
+    // random network that just happens to have the same topolopy as net1...
+    // and a topology that eventually breaks because mutations are only supposed to happen as a population
+    for (int i = 0; i < 40; i++)
+        net3.mutate();
+
+    std::cout << pop.history << std::endl;
+    std::cout << net1.genome << std::endl;
+    std::cout << net2.genome << std::endl;
+    std::cout << net3.genome << std::endl;
+
+    for (Genetic::Gene& gene : net1.genome)
+        std::cout << gene.innovation << " ";
+    std::cout << std::endl;
+
+    for (Genetic::Gene& gene : net2.genome)
+        std::cout << gene.innovation << " ";
+    std::cout << std::endl;
+
+    for (Genetic::Gene& gene : net3.genome)
+        std::cout << gene.innovation << " ";
+    std::cout << std::endl;
+
+    std::cout << pop.compatibility(net1, net2) << std::endl;
+    std::cout << pop.compatibility(net1, net3) << std::endl;
+    std::cout << pop.compatibility(net2, net3) << std::endl;
+}
+
+float play_snake(Genetic::Network& net)
+{
+    std::list<float> input = {0.5, 0.6, 0.7};
+
+    float sum = 0;
+    std::list<float> output;
+    for (int i = 0; i < 500; i++)
+    {
+        output = net.compute(input);
+        sum += std::accumulate(output.begin(), output.end(), 0.0);
+    }
+
+    return sum;
+}
+
+TEST(GeneticTests, PopulationClass)
+{
+    Genetic::Population population(50, 3, 4);
+    population.ct = 1.0;
+
+    for (int i = 0; i < 25; i++)
+    {
+        std::cout << "gen " << i << std::endl;
+        std::cout << population.history << std::endl;
+        std::cout << population.species << std::endl;
+        // for (Genetic::Network& net : population.nets)
+        //     std::cout << net;
+
+        population.mutate();
+
+        population.compete(play_snake);
+    }
+
+    // std::cout << (float)(population.innovation) / 50.0 << std::endl;
+    // std::cout << std::thread::hardware_concurrency() << std::endl;
+    // std::cout << population.innovation << std::endl;
+    // std::cout << population.history.size() << std::endl;
+}
+
+TEST(GeneticTests, PopFromFile)
+{
+    Genetic::Population pop("../tests/test.net", 5);
+
+    std::cout << pop.nets << std::endl;
+}
+
+TEST(GeneticTests, SaveNetwork)
+{
+    Genetic::Population pop(1, 3, 4);
+
+    for (int i = 0; i < 25; i++)
+    {
+        pop.mutate();
+    }
+
+    pop.nets.front().save("test.net");
+
+    std::cout << pop.nets.front() << std::endl;
+
+    std::ifstream check("test.net");
+    std::string line;
+
+    while (std::getline(check, line))
+        std::cout << line << std::endl;
+}
+
+TEST(GeneticTests, visualizeNetwork)
+{
+    Genetic::Population pop(1, 2, 2);
+    Genetic::Network& net1 = pop.nets.front();
+
+    net1.addConnection(&net1.nodes.front().front(), &net1.nodes.back().front(),
+                       0.3);
+    net1.addNode(&net1.connections.front().front());
+    net1.connections.back().front().weight = 0.4;
+    net1.addConnection(&net1.nodes.front().back(), &net1.nodes.back().back(),
+                       0.5);
+    net1.addConnection(&net1.nodes.front().back(),
+                       &(++net1.nodes.begin())->front(), 0.7);
+
+    net1.visualize("test.dot");
 }

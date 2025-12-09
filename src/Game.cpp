@@ -1,12 +1,72 @@
 #include "Game.hpp"
 
-Game::Game(int w, int h) : width(w), height(h), time(0), snake(), apple(-1, -1)
+Coordinate::Coordinate(int xi, int yi) : x(xi), y(yi) {};
+
+Coordinate::Coordinate(Direction dir)
 {
-    snake.push_front(new Coordinate(width / 2 - 1, height / 2));
-    snake.move(Right);
-    snake.move(Right);
-    generateApple();
+    switch (dir)
+    {
+        case Left:
+            x = -1;
+            y = 0;
+            break;
+        case Right:
+            x = 1;
+            y = 0;
+            break;
+        case Up:
+            x = 0;
+            y = -1;
+            break;
+        case Down:
+            x = 0;
+            y = 1;
+            break;
+        default:
+            x = 0;
+            y = 0;
+            break;
+    }
 }
+
+std::ostream& operator<<(std::ostream& os, Coordinate& coord)
+{
+    os << "(" << coord.x << "," << coord.y << ")";
+    return os;
+};
+
+bool operator==(Coordinate lhs, Coordinate rhs)
+{
+    return (lhs.x == rhs.x) && (lhs.y == rhs.y);
+};
+
+Coordinate operator+(Coordinate& lhs, Coordinate& rhs)
+{
+    return Coordinate(lhs.x + rhs.x, lhs.y + rhs.y);
+};
+
+Coordinate operator+(Coordinate& lhs, Coordinate rhs)
+{
+    return Coordinate(lhs.x + rhs.x, lhs.y + rhs.y);
+};
+
+bool Snake::move(Direction dir)
+{
+    if (dir == none)
+        return false;
+
+    emplace_front(front() + dir);
+
+    return true;
+};
+
+Game::Game(int w, int h)
+    : width(w), height(h), time(0), snake(), apple(-1, -1), next_apple(0)
+{
+    snake.emplace_front(width / 2 - 1, height / 2);
+    snake.move(Right);
+    snake.move(Right);
+};
 
 void Game::generateApple()
 {
@@ -14,50 +74,61 @@ void Game::generateApple()
 
     while (collideApple())
         apple = Coordinate(rand() % width, rand() % height);
-}
+};
 
 bool Game::collideApple()
 {
-    for (Coordinate pos : snake)
-        if (pos == apple)
+    for (Coordinate segment : snake)
+        if (segment == apple)
             return true;
 
     return false;
-}
+};
+
+bool Game::collideWall(Coordinate head)
+{
+    return (head.x < 0) || (head.x >= width) || (head.y < 0) ||
+           (head.y >= height);
+};
 
 bool Game::collideWall()
 {
-    return ((snake.head->data->x < 0) || (snake.head->data->x >= width) ||
-            (snake.head->data->y < 0) || (snake.head->data->y >= height));
+    return collideWall(snake.front());
 }
 
-bool Game::collideSnake()
+bool Game::collideSnake(Coordinate head)
 {
-    LL::Node<Coordinate>* cur = snake.head;
-    while ((cur = cur->next))
-        if (snake.head == cur)
+    Snake::iterator segment = snake.begin();
+    while (++segment != snake.end())
+        if (head == *segment)
             return true;
 
     return false;
+};
+
+bool Game::collideSnake()
+{
+    return collideSnake(snake.front());
 }
 
 bool Game::iterate(Direction action)
 {
     bool moved = snake.move(action);
 
-    if (collideApple())
+    if (snake.front() == apple)
     {
-        generateApple();
+        apple = Coordinate(-1, -1);
+        next_apple = time + 3;
     }
     else
     {
         snake.pop_back();
     }
 
+    if ((time > next_apple) && (apple == Coordinate(-1, -1)))
+        generateApple();
+
     time++;
 
     return moved && !collideWall() && !collideSnake();
 }
-
-// int Game::run(std::function action_generator): return length
-// while (test.iterate(action_generator()))

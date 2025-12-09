@@ -1,0 +1,26 @@
+#ifndef INCLUDE_CHEATSNAKE_THREADPOOL_HPP_
+#define INCLUDE_CHEATSNAKE_THREADPOOL_HPP_
+
+#include <condition_variable>
+#include <functional>
+#include <mutex>
+#include <queue>
+#include <thread>
+
+class ThreadPool
+{
+   public:
+    ThreadPool(size_t num_threads = std::thread::hardware_concurrency());
+    ~ThreadPool();
+
+    void enqueue(std::function<void()> task);
+
+   private:
+    std::vector<std::thread> threads_;
+    std::queue<std::function<void()>> tasks_;
+    std::mutex queue_mutex_;
+    std::condition_variable cv_;
+    bool stop_ = false;
+};
+
+#endif  // INCLUDE_CHEATSNAKE_THREADPOOL_HPP_
