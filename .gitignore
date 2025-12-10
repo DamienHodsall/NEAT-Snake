@@ -2,3 +2,5 @@ build
 .cache
 out
 compile_commands.json
+champions
+latest.net
