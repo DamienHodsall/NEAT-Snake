@@ -100,11 +100,11 @@ float play_snake(Genetic::Network& net, Serial* serialConnection, int period)
 
         // appleDistance
         if (game.apple == Coordinate(-1, -1))
+            parameters.push_back(0.0);
+        else
             parameters.push_back((float)(abs(head.x - game.apple.x) +
                                          abs(head.y - game.apple.y)) /
                                  (float)area);
-        else
-            parameters.push_back(0.0);
 
         // appleDirection
         if (game.apple == Coordinate(-1, -1))
