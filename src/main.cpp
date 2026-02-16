@@ -5,6 +5,10 @@
 #include "Genetic.hpp"
 #include "play_snake.cpp"
 
+#include "Serial.h"
+
+Serial* serialConnection = new Serial();
+
 int num_games = 3;
 
 float comp_func(Genetic::Network& net)
@@ -23,13 +27,20 @@ int main()
     std::cout << seed << std::endl;  // kinda useless when I'm threading...
     srand(seed);
 
+    bool showRecap = false;
+    if (serialConnection->begin("/dev/ttyACM0", B115200))
+    {
+        std::cout << "Playing generation recap" << std::endl;
+        showRecap = true;
+    }
+
     // PARAMETERS:
     //      Rectilinear distance to the apple       (0)
     //      apple to the Left/Right/Up/Down         (1,2)
     //      distance to Left/Right/Up/Down wall     (3,4,5,6)
     //      next to snake Left/Right/Up/Down        (7,8,9,10)
     //      bias                                    (11)
-    Genetic::Population population(500, 12, 4);
+    Genetic::Population population(750, 12, 4);
     // Genetic::Population population("champions/2025-09-28 17:38:42/2500.net",
     //                                1000);
     // Genetic::Population population("latest.net", 500);
@@ -44,6 +55,10 @@ int main()
                   << std::endl;
         population.mutate();
         population.compete(comp_func);
+
+        // show the best of each generation
+        if (showRecap)
+            play_snake(population.nets.back(), serialConnection, 20);
     }
 
     Genetic::Network& net = population.nets.back();
