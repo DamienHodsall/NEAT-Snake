@@ -874,6 +874,21 @@ Population::Population(std::string filename, int pop_size)
     }
 }
 
+void Population::save_species()
+{
+    int count = 0;
+    std::string species_folder = folder + "/species/";
+    mkdir(species_folder.c_str(), 0777);
+
+    for (std::list<Network*>& spec : species)
+    {
+        count++;
+        std::list<Network*>::iterator specrep = spec.begin();
+        std::advance(specrep, rand() % spec.size());
+        (*specrep)->save(species_folder + std::to_string(count) + ".net");
+    }
+}
+
 void Population::speciate_network(Network* net)
 {
     // add to existing species

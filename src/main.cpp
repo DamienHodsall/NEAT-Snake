@@ -53,6 +53,8 @@ int main()
     std::cout << net << std::endl;
     net.save(filename);
 
+    population.save_species();
+
     // for (auto& spec : population.species)
     //     std::cout << spec.size() << " ";
     // std::cout << "\n" << net << std::endl;

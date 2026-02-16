@@ -113,6 +113,8 @@ class Population
     Population(int pop_size, int n_in, int n_out);
     Population(std::string filename, int pop_size);
 
+    void save_species();
+
     void mutate();
     void compete(float (*comp_func)(Network&));
 
